@@ -68,9 +68,7 @@ pipeline
           {
 
                 bat "if exist  allure- results rmdir /s /q allure-results"
-                bat "set TEST_ENV=%ENVIRONMENT_NAME% && npx playwright test"
-                bat  " npx playwright test --project=%BROWSER_NAME% --grep %SUITE_NAME% --workers=%WORKER_NUMBER%"
-                 
+                bat "set TEST_ENV=%ENVIRONMENT_NAME% && npx playwright test --project=%BROWSER_NAME% --grep=%SUITE_NAME% --workers=%WORKER_NUMBER%"
 
           }
  
