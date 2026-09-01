@@ -20,14 +20,14 @@ pipeline
            description : 'Select the Suite Name'
                )
 
-       String (
+       string (
              name : 'BRANCH_NAME',
              defaultValue : 'master',
              description :'Enter Branch Name'
 
               )
 
-     String (
+     string (
 
                name : 'WORKER_NUMBER',
                defaultValue :1,
@@ -49,7 +49,7 @@ pipeline
      {
          steps
           {
-               bat npm ci
+               bat "npm ci"
            }
        }
 
