@@ -57,7 +57,7 @@ pipeline
        {
            steps
             {
-                bat "npx playwright install"
+                bat "npm init playwright"
              }
          }
 
