@@ -1,92 +1,85 @@
-pipeline {
-    agent any
-
-    parameters {
-
-        choice(
-            name: 'ENVIRONMENT_NAME',
-            choices: ['qa', 'uat', 'staging'],
-            description: 'Select the environment Name'
-        )
-
-        choice(
-            name: 'BROWSER_NAME',
-            choices: ['chromium', 'webkit'],
-            description: 'Select the browser Name'
-        )
-
-        choice(
-            name: 'SUITE_NAME',
-            choices: ['Regression', 'Smoke', 'sanity', 'e2e'],
-            description: 'Select the Suite Name'
-        )
-
-        string(
-            name: 'BRANCH_NAME',
-            defaultValue: 'master',
-            description: 'Enter Branch Name'
-        )
-
-        string(
-            name: 'WORKER_NUMBER',
-            defaultValue: '1',
-            description: 'Enter worker Number'
-        )
+pipeline
+{
+  agent any
+  
+    parameters
+    {
+      choice(
+          name : 'ENVIRONMENT_NAME',
+          choices : ['qa', 'uat', 'staging'],
+          description : 'select environment name'
+      )
+      choice(
+          name : 'BROWSER_NAME',
+          choices : ['chromium', 'firefox', 'webkit'],
+          description : 'Selct Browser Name'
+      )
+      choice(
+          name : 'SUITE_NAME',
+          choices : ['Regression', 'Smoke', 'Sanity', 'E2E'],
+          description : 'Select Suite Name'
+      )
+      string(
+          name : 'BRANCH_NAME',
+          defaultValue : 'master',
+          description : 'Enter Branch Name'
+      )
+      choice(
+          name : 'WORKER_NUMBER',
+          choices : [1, 2, 3, 4, 5],
+          description : 'Select Workers Number'
+      )
+    }
+    stages
+    {
+      stage("Clone GitHub Repository")
+      {
+        steps
+          {
+              git url : "https://github.com/tejaswi2188/SauceDemoDeclarativePipeline_01.git",
+              branch : "${params.BRANCH_NAME}"
+          }
+      }
+      stage("install package.json dependencies")
+      {
+          steps
+          {
+              bat "npm ci"
+          }
+      }
+      stage("install playwright")
+      {
+          steps
+          {
+              bat "npm install playwright"
+          }
+      }
+      stage("Execute Test cases")
+      {
+        steps
+        {
+            script
+              {
+                  bat "if exist allure-results rmdir /s /q allure-results"
+                  bat "set TEST_ENV = %ENVIRONMENT_NAME%"
+                  bat "npx playwright test --project=%BROWSER_NAME% --grep %SUITE_NAME% --workers=${params.WORKER_NUMBER.toInteger()}"
+              }
+        }
+      }
     }
 
-    stages {
-
-        stage('Clone GitHub Repository') {
-            steps {
-                git(
-                    url: 'https://github.com/tejaswi2188/SauceDemoDeclarativePipeline_01.git',
-                    branch: "${params.BRANCH_NAME}"
-                )
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                bat 'npm ci'
-            }
-        }
-
-        stage('Install Playwright Browsers') {
-            steps {
-                bat 'npx playwright install'
-            }
-        }
-
-        stage('Check Environment') {
-            steps {
-                bat 'echo Selected Environment: %ENVIRONMENT_NAME%'
-                bat 'echo Selected Browser: %BROWSER_NAME%'
-                bat 'echo Selected Suite: %SUITE_NAME%'
-                bat 'echo Selected Workers: %WORKER_NUMBER%'
-                bat 'dir env'
-                bat 'type env\\%ENVIRONMENT_NAME%.env'
-            }
-        }
-
-        stage('Execute Test Cases') {
-            steps {
-                bat 'if exist allure-results rmdir /s /q allure-results'
-
-                bat 'set TEST_ENV=%ENVIRONMENT_NAME% && npx playwright test --project=%BROWSER_NAME% --grep=%SUITE_NAME% --workers=%WORKER_NUMBER%'
-            }
-        }
+post{
+    always
+    {
+      script
+      {
+          allure([
+              includeProperties : false,
+              reportBuildPolicy : 'ALWAYS',
+              results : [[path : 'allure-results']]
+          ])
+      }
     }
-
-    post {
-
-        always {
-            script {
-                allure([
-                    includeProperties: false,
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'allure-results']]
-                ])
-            }
-        }
-    }
+}
+  
 }
