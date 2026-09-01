@@ -41,7 +41,7 @@ pipeline
      {
          steps
          {
-              git url : 'https://github.com/tejaswi2188/SauceDemoDeclarativePipeline_01.git',branch: "${BRANCH_NAME}"
+              git url : 'https://github.com/tejaswi2188/SauceDemoDeclarativePipeline_01.git',branch: "${params.BRANCH_NAME}"
           }
      }
 
@@ -57,7 +57,7 @@ pipeline
        {
            steps
             {
-                bat "npm install playwright"
+                bat "npx playwright install"
              }
          }
 
@@ -67,7 +67,7 @@ pipeline
           steps
           {
 
-                bat "if exist  allure- results rmdir/s/q allure-results"
+                bat "if exist  allure- results rmdir /s /q allure-results"
                 bat "set TEST_ENV=%ENVIRONMENT_NAME% && npx playwright test"
                 bat  " npx playwright test --project=%BROWSER_NAME% --grep %SUITE_NAME% --workers=%WORKER_NUMBER%"
                  
@@ -89,7 +89,7 @@ always
 
                 includeProperties : false,
                  reportBuildPolicy : 'ALWAYS',
-                 result : [[path : 'allure-results']]
+                 results : [[path : 'allure-results']]
               ])
 
 }
