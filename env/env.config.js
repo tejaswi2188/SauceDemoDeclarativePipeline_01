@@ -7,7 +7,7 @@ console.log(`Executing Test Cases on ${envName.toUpperCase()}`);
 
 dotenv.config({path:`./env/${envName}.env`,override : true});
 
-module.exports =
+export default 
 {
     BASE_URL: process.env.BASE_URL,
     USERNAME : process.env.USERNAME,
