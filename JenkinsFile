@@ -68,18 +68,15 @@ pipeline
       }
     }
 
-post{
-    always
-    {
-      script
-      {
-          allure([
-              includeProperties : false,
-              reportBuildPolicy : 'ALWAYS',
-              results : [[path : 'allure-results']]
-          ])
-      }
+post {
+    always {
+        script {
+            allure([
+                commandline: 'Allure',
+                includeProperties: false,
+                reportBuildPolicy: 'ALWAYS',
+                results: [[path: 'allure-results']]
+            ])
+        }
     }
-}
-  
 }
